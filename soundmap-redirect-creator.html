@@ -140,8 +140,22 @@
 
   // Called from the tiny script right after the splash markup,
   // so phones act without waiting for the rest of the page to download.
+  var DEBUG = /[?&]debug=1/.test(location.search);
+
   window.__splashShown = function () {
     var btn = document.getElementById("splash-btn");
+    if (DEBUG) {
+      if (btn && os) btn.href = (os === "android" && inApp) ? ANDROID_CHROME : (os === "ios" && inApp) ? IOS_SAFARI : APP_LINK;
+      var p = document.createElement("pre");
+      p.style.cssText = "margin:24px 0 0;max-width:460px;text-align:left;white-space:pre-wrap;word-break:break-all;font:12px/1.4 ui-monospace,monospace;color:#1ed760;background:#000;padding:12px;border-radius:12px";
+      p.textContent = "DEBUG (no redirect)\napp: " + (_app || "browser") + " · os: " + _os + " · inApp: " + inApp +
+        "\ncreator: " + (_creator || "-") + " · source: " + _source +
+        "\n\nAppsFlyer link:\n" + APP_LINK +
+        "\n\nsteps:\n" + (steps.length ? steps.map(function (s, n) { return (n + 1) + ". " + s; }).join("\n") : "(desktop: show landing)") +
+        "\n\nUA: " + (navigator.userAgent || "");
+      var sp = document.getElementById("splash"); if (sp) sp.appendChild(p);
+      return;
+    }
     // A tap is the most reliable way out, so the button uses the strongest escape link
     if (btn && os) btn.href = (os === "android" && inApp) ? ANDROID_CHROME : (os === "ios" && inApp) ? IOS_SAFARI : APP_LINK;
     requestAnimationFrame(function () {
@@ -153,7 +167,7 @@
       });
     });
   };
-  document.addEventListener("DOMContentLoaded", function () { domReady = true; maybeReveal(); });
+  document.addEventListener("DOMContentLoaded", function () { domReady = true; if (!DEBUG) maybeReveal(); });
 })();
 </script>
 <!-- ===== end redirect + splash ===== -->
