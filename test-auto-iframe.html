@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Auto iframe</title><style>body{margin:0;background:#121212;color:#fff;font-family:-apple-system,system-ui,"Noto Sans",sans-serif;padding:20px 16px 40px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:15px;margin:22px 0 8px;color:#1ed760}
+p,li{color:#bbb;font-size:14px;line-height:1.45}.box{background:#1d1d1d;border-radius:12px;padding:12px;font:12px/1.4 ui-monospace,monospace;word-break:break-all;white-space:pre-wrap}
+a.b,button.b{display:block;width:100%;box-sizing:border-box;text-align:left;margin:8px 0;padding:14px;border-radius:12px;border:0;background:#292929;color:#fff;font-size:15px;font-weight:600;text-decoration:none}
+a.b small,button.b small{display:block;color:#999;font-weight:400;font-size:12px;margin-top:3px}
+.ok{color:#1ed760}.bad{color:#ff6b6b}#log div{margin:2px 0}</style></head><body><h1>Auto iframe</h1><p>Esta página intenta salir sola al cargar. Si sigues aquí después de 2 s, no funcionó en esta app.</p><div class="box" id="i"></div><div class="box" id="r" style="margin-top:10px">Probando…</div><p><a style="color:#1ed760" href="test-lab.html">← volver al lab</a></p><script>var ONELINK="https://soundmap.onelink.me/9FDK/hq1cr7p3";
+var UA=navigator.userAgent||"";
+var isIOS=/iPhone|iPad|iPod/i.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var isAndroid=/Android/i.test(UA);
+function appName(){if(/Instagram/i.test(UA))return"Instagram";if(/FBAN|FBAV|FB_IAB|FBIOS|FB4A/i.test(UA))return"Facebook";if(/Messenger/i.test(UA))return"Messenger";if(/musical_ly|Bytedance|TikTok/i.test(UA))return"TikTok";if(/CriOS/i.test(UA))return"Chrome (iOS)";if(/FxiOS/i.test(UA))return"Firefox (iOS)";if(isIOS&&/Safari\//.test(UA))return"Safari";if(/Chrome\//.test(UA)&&!/; wv\)/.test(UA))return"Chrome/Browser";return"Unknown / webview";}
+function qp(k){var m=new RegExp("[?&]"+k+"=([^&]*)").exec(location.search);return m?decodeURIComponent(m[1]):null;}
+var DEST_MODE=qp("dest")==="onelink"?"onelink":"arrived";
+function destFor(method){
+  if(DEST_MODE==="onelink") return ONELINK+"?af_sub1="+encodeURIComponent(appName().toLowerCase())+"&af_sub2="+(isIOS?"ios":isAndroid?"android":"other")+"&af_sub3="+encodeURIComponent(method);
+  var u=new URL("test-arrived.html",location.href); u.searchParams.set("method",method); u.searchParams.set("from",appName()); return u.href;
+}
+var M={
+ xsafari:function(d){return "x-safari-"+d;},
+ extbrowser:function(d){return "instagram://extbrowser/?url="+encodeURIComponent(d);},
+ chrome:function(d){return d.replace(/^https:/,"googlechromes:");},
+ firefox:function(d){return "firefox://open-url?url="+encodeURIComponent(d);},
+ shortcuts:function(d){return "shortcuts://x-callback-url/run-shortcut?name="+(Math.random().toString(36).slice(2))+"&x-error="+encodeURIComponent(d);},
+ intent:function(d){var u=new URL(d);return "intent://"+u.host+u.pathname+u.search+"#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url="+encodeURIComponent(d)+";end";},
+ intentchrome:function(d){var u=new URL(d);return "intent://"+u.host+u.pathname+u.search+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(d)+";end";},
+ intentshort:function(d){return "intent:"+d+"#Intent;end";},
+ plain:function(d){return d;}
+};
+function iframeHit(href){try{var f=document.createElement("iframe");f.style.display="none";document.body.appendChild(f);try{f.contentWindow.location.href=href;}catch(e){f.src=href;}setTimeout(function(){f.remove();},2500);}catch(e){}}
+function watch(label,cb){var left=false;function on(){left=true;}document.addEventListener("visibilitychange",function(){if(document.hidden)on();});window.addEventListener("pagehide",on);window.addEventListener("blur",on);setTimeout(function(){cb(left||document.hidden);},2000);}
+document.getElementById("i").textContent="App: "+appName()+"\nOS: "+(isIOS?"iOS":isAndroid?"Android":"other");
+watch("auto",function(left){var r=document.getElementById("r");r.className=left?"box ok":"box bad";r.textContent=left?"Salió de la página ✓ (si volviste aquí, revisa qué se abrió)":"No pasó nada ✗";});
+setTimeout(function(){iframeHit(M.xsafari(destFor('auto-iframe-xsafari')));setTimeout(function(){if(!document.hidden)iframeHit(M.extbrowser(destFor('auto-iframe-extbrowser')));},700);},300);</script></body></html>
